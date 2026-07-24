@@ -24,4 +24,5 @@ public class HomeController {
     public String version() {
         return "Version 1.0";
     }
+
 }
