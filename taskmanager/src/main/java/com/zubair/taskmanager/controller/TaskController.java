@@ -1,5 +1,7 @@
 package com.zubair.taskmanager.controller;
 
+import com.zubair.taskmanager.dto.DashboardResponse;
+
 import com.zubair.taskmanager.dto.TaskRequest;
 import com.zubair.taskmanager.entity.Task;
 import com.zubair.taskmanager.service.TaskService;
@@ -69,5 +71,10 @@ public class TaskController {
 
         return taskService.sortTasks();
 
+    }
+
+    @GetMapping("/dashboard")
+    public DashboardResponse dashboard(){
+        return taskService.getDashboard();
     }
 }

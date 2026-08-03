@@ -1,5 +1,6 @@
 package com.zubair.taskmanager.service;
 
+import com.zubair.taskmanager.dto.DashboardResponse;
 import com.zubair.taskmanager.dto.TaskRequest;
 import com.zubair.taskmanager.dto.TaskResponse;
 import com.zubair.taskmanager.entity.Task;
@@ -89,6 +90,16 @@ public class TaskService {
 
         return taskRepository.findAll(
                 Sort.by("title"));
+    }
+
+    public DashboardResponse getDashboard(){
+        DashboardResponse dashboard = new DashboardResponse();
+
+        dashboard.setTotalTasks(taskRepository.count());
+        dashboard.setCompletedTasks(taskRepository.countByStatus("COMPLETED"));
+        dashboard.setPendingTasks(taskRepository.countByStatus("PENDING"));
+
+        return dashboard;
     }
 
 
