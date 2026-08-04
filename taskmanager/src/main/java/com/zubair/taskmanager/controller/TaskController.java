@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
 
 @RestController
@@ -21,6 +23,7 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping
     public Task createTask(@Valid @RequestBody TaskRequest request){
         return taskService.saveTask(request);
@@ -31,31 +34,40 @@ public class TaskController {
         return taskService.getAllTasks();
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{id:\\d+}")
     public Task getTask(@PathVariable Long id){
         return taskService.getTaskById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id:\\d+}")
     public String deleteTask(@PathVariable Long id){
+
         taskService.deleteTask(id);
-        return "task deleted sucessfully.";
+
+        return "Task deleted successfully.";
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id:\\d+}")
     public Task updateTask(@PathVariable Long id,@Valid @RequestBody TaskRequest request){
         return taskService.updateTask(id,request);
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/search/{keyword}")
     public List<Task> searchTask(@PathVariable String keyword){
         return taskService.searchTasks(keyword);
     }
+
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/status")
     public List<Task> getByStatus(
             @RequestParam String status){
         return taskService.getTasksByStatus(status);
     }
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/page")
     public Page<Task> getTasks(
 
@@ -66,6 +78,7 @@ public class TaskController {
         return taskService.getTasks(page,size);
 
     }
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/sort")
     public List<Task> sortTasks(){
 
@@ -73,8 +86,12 @@ public class TaskController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dashboard")
     public DashboardResponse dashboard(){
+
         return taskService.getDashboard();
     }
+
+
 }
