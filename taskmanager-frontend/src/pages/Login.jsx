@@ -1,44 +1,7 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link } from "react-router-dom";
 
 function Login() {
-
-    const navigate = useNavigate();
-
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-
-    const handleLogin = async (e) => {
-
-        e.preventDefault();
-
-        try {
-
-            const response = await axios.post(
-                "http://localhost:8080/api/auth/login",
-                {
-                    email,
-                    password
-                }
-            );
-
-            localStorage.setItem("token", response.data.token);
-
-            alert("Login Successful");
-
-            navigate("/dashboard");
-
-        } catch (error) {
-
-            alert("Invalid Email or Password");
-
-        }
-
-    };
-
     return (
-
         <div className="container mt-5">
 
             <div className="row justify-content-center">
@@ -53,34 +16,22 @@ function Login() {
                                 Login
                             </h2>
 
-                            <form onSubmit={handleLogin}>
+                            <form>
 
                                 <div className="mb-3">
-
                                     <label>Email</label>
-
                                     <input
                                         type="email"
                                         className="form-control"
-                                        value={email}
-                                        onChange={(e)=>setEmail(e.target.value)}
-                                        required
                                     />
-
                                 </div>
 
                                 <div className="mb-3">
-
                                     <label>Password</label>
-
                                     <input
                                         type="password"
                                         className="form-control"
-                                        value={password}
-                                        onChange={(e)=>setPassword(e.target.value)}
-                                        required
                                     />
-
                                 </div>
 
                                 <button
@@ -92,17 +43,13 @@ function Login() {
                             </form>
 
                             <p className="mt-3 text-center">
-
                                 Don't have an account?
-
                                 <Link to="/register">
                                     Register
                                 </Link>
-
                             </p>
 
                         </div>
-
                     </div>
 
                 </div>
@@ -110,9 +57,7 @@ function Login() {
             </div>
 
         </div>
-
     );
-
 }
 
 export default Login;
