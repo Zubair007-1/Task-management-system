@@ -1,6 +1,43 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../services/api";
+import { toast } from "react-toastify";
 
 function Register() {
+
+    const navigate = useNavigate();
+
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        password: ""
+    });
+
+    const handleChange = (e) => {
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+
+            await api.post("/auth/register", form);
+
+            toast.success("Registration Successful");
+
+            navigate("/");
+
+        } catch (error) {
+
+            toast.error("Registration Failed");
+
+        }
+
+    };
 
     return (
 
@@ -14,39 +51,33 @@ function Register() {
 
                         <div className="card-body">
 
-                            <h2 className="text-center mb-4">
-                                Register
-                            </h2>
+                            <h2 className="text-center mb-4">Register</h2>
 
-                            <form>
+                            <form onSubmit={handleSubmit}>
 
-                                <div className="mb-3">
-                                    <label>Name</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                    />
-                                </div>
+                                <input
+                                    className="form-control mb-3"
+                                    placeholder="Name"
+                                    name="name"
+                                    onChange={handleChange}
+                                />
 
-                                <div className="mb-3">
-                                    <label>Email</label>
-                                    <input
-                                        type="email"
-                                        className="form-control"
-                                    />
-                                </div>
+                                <input
+                                    className="form-control mb-3"
+                                    placeholder="Email"
+                                    name="email"
+                                    onChange={handleChange}
+                                />
 
-                                <div className="mb-3">
-                                    <label>Password</label>
-                                    <input
-                                        type="password"
-                                        className="form-control"
-                                    />
-                                </div>
+                                <input
+                                    type="password"
+                                    className="form-control mb-3"
+                                    placeholder="Password"
+                                    name="password"
+                                    onChange={handleChange}
+                                />
 
-                                <button
-                                    className="btn btn-success w-100"
-                                >
+                                <button className="btn btn-success w-100">
                                     Register
                                 </button>
 
@@ -56,9 +87,7 @@ function Register() {
 
                                 Already have an account?
 
-                                <Link to="/">
-                                    Login
-                                </Link>
+                                <Link to="/"> Login </Link>
 
                             </p>
 
