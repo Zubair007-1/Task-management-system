@@ -96,7 +96,7 @@ public class SecurityConfig {
 
                         // Task APIs
                         .requestMatchers("/api/tasks/delete/**")
-                        .hasRole("ADMIN")
+                        .hasAnyRole("USER","ADMIN")
 
                         .requestMatchers("/api/tasks/**")
                         .hasAnyRole("USER", "ADMIN")
