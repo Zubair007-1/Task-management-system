@@ -1,0 +1,6 @@
+import{c as a,a as s,j as e}from"./index-DuABDF-H.js";import{B as r}from"./Button-B8Pa4x25.js";import{A as d}from"./arrow-left-pwDHNA6z.js";/**
+ * @license lucide-react v0.408.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const i=a("ShieldAlert",[["path",{d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",key:"oel41y"}],["path",{d:"M12 8v4",key:"1got3b"}],["path",{d:"M12 16h.01",key:"1drbdi"}]]);function l(){const t=s();return e.jsxs("div",{className:"min-h-screen flex flex-col items-center justify-center p-6 bg-surface dark:bg-slate-900 text-center",children:[e.jsx("div",{className:"w-20 h-20 rounded-full bg-red-100 dark:bg-red-950/20 flex items-center justify-center text-red-500 mb-6 animate-bounce-subtle",children:e.jsx(i,{className:"w-10 h-10"})}),e.jsx("h1",{className:"text-4xl font-extrabold text-slate-800 dark:text-slate-100 mb-2",children:"403 Forbidden"}),e.jsx("p",{className:"text-slate-500 dark:text-slate-400 max-w-md mb-8",children:"You do not have administrative access permissions to view this dashboard resource."}),e.jsx(r,{icon:d,onClick:()=>t("/"),children:"Return to Dashboard"})]})}export{l as default};
