@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import api from './api';
 
 export const authService = {
@@ -27,3 +28,6 @@ export function decodeJwt(token) {
     return null;
   }
 }
+=======
+
+>>>>>>> e05702623da63c35a8dabec1659cac1ea9b63097

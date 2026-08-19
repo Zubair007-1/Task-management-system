@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
@@ -37,3 +38,48 @@ export default function App() {
     </QueryClientProvider>
   );
 }
+=======
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import CreateTask from "./pages/CreateTask";
+import EditTask from "./pages/EditTask";
+
+function App() {
+    return (
+        <BrowserRouter>
+            <Routes>
+
+              <Route
+                  path="/"
+                  element={<Login />}
+              />
+
+              <Route
+                  path="/register"
+                  element={<Register />}
+              />
+
+              <Route
+                  path="/dashboard"
+                  element={<Dashboard />}
+              />
+
+              <Route
+                  path="/tasks/create"
+                  element={<CreateTask />}
+              />
+              
+              <Route
+                path="/tasks/edit/:id"
+                element={<EditTask />}
+               />
+
+          </Routes>
+                  </BrowserRouter>
+              );
+          }
+
+export default App;
+>>>>>>> e05702623da63c35a8dabec1659cac1ea9b63097
