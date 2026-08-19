@@ -8,60 +8,26 @@ function Dashboard() {
     const navigate = useNavigate();
 
     const [tasks, setTasks] = useState([]);
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("ALL");
+    const [priorityFilter, setPriorityFilter] = useState("ALL");
     const [loading, setLoading] = useState(true);
-    const deleteTask = async (id) => {
-
-    const confirmed = window.confirm(
-        "Are you sure you want to delete this task?"
-    );
-
-    if (!confirmed) {
-        return;
-    }
-
-    try {
-
-        await api.delete(`/tasks/${id}`);
-
-        toast.success("Task deleted successfully");
-
-        loadTasks();
-
-    } catch (error) {
-
-        console.error(error);
-
-        toast.error("Failed to delete task");
-    }
-};
 
     const loadTasks = async () => {
 
         try {
 
-            const response = await api.get("/tasks");
+            setLoading(true);
 
-            console.log("Tasks:", response.data);
+            const response = await api.get("/tasks");
 
             setTasks(response.data);
 
         } catch (error) {
 
-            console.error("Task loading error:", error);
+            console.error(error);
 
-            if (error.response?.status === 401 ||
-                error.response?.status === 403) {
-
-                toast.error("Session expired. Please login again.");
-
-                localStorage.removeItem("token");
-
-                navigate("/");
-
-            } else {
-
-                toast.error("Unable to load tasks.");
-            }
+            toast.error("Failed to load tasks");
 
         } finally {
 
@@ -70,160 +36,477 @@ function Dashboard() {
     };
 
     useEffect(() => {
-
         loadTasks();
-
     }, []);
 
-    const handleLogout = () => {
+    const deleteTask = async (id) => {
+
+        if (!window.confirm("Are you sure you want to delete this task?")) {
+            return;
+        }
+
+        try {
+
+            await api.delete(`/tasks/delete/${id}`);
+
+            toast.success("Task deleted successfully");
+
+            loadTasks();
+
+        } catch (error) {
+
+            console.error(error);
+
+            if (error.response?.status === 403) {
+                toast.error("You don't have permission to delete this task.");
+            } else {
+                toast.error("Failed to delete task");
+            }
+        }
+    };
+
+    const logout = () => {
 
         localStorage.removeItem("token");
 
-        toast.success("Logged out successfully");
-
-        navigate("/");
+        navigate("/login");
     };
 
+    const filteredTasks = tasks.filter((task) => {
+
+    const title = String(task.title || "").toLowerCase();
+    const description = String(task.description || "").toLowerCase();
+
+    const taskStatus = String(task.status || "").toUpperCase();
+    const taskPriority = String(task.priority || "").toUpperCase();
+
+    const searchText = search.toLowerCase().trim();
+
+    const matchesSearch =
+        title.includes(searchText) ||
+        description.includes(searchText);
+
+    const matchesStatus =
+        statusFilter === "ALL" ||
+        taskStatus === statusFilter;
+
+    const matchesPriority =
+        priorityFilter === "ALL" ||
+        taskPriority === priorityFilter;
+
     return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesPriority
+    );
+});
 
-        <div className="container mt-4">
+    const totalTasks = tasks.length;
 
-            <div className="d-flex justify-content-between align-items-center mb-4">
+    const pendingTasks =
+        tasks.filter(task => task.status === "PENDING").length;
 
-                <div>
-                    <h2>Task Manager</h2>
-                    <p className="text-muted mb-0">
-                        Dashboard
-                    </p>
+    const inProgressTasks =
+        tasks.filter(task => task.status === "IN_PROGRESS").length;
+
+    const completedTasks =
+        tasks.filter(task => task.status === "COMPLETED").length;
+
+    return (
+        <div className="bg-light min-vh-100">
+
+            {/* NAVBAR */}
+
+            <nav className="navbar navbar-dark bg-primary shadow-sm">
+
+                <div className="container">
+
+                    <span
+                        className="navbar-brand fw-bold"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate("/dashboard")}
+                    >
+                        <i className="bi bi-check2-square me-2"></i>
+                        TaskManager
+                    </span>
+
+                    <div className="d-flex align-items-center text-white">
+
+                        <span className="me-3 d-none d-md-block">
+                            Welcome
+                        </span>
+
+                        <button
+                            className="btn btn-outline-light btn-sm"
+                            onClick={logout}
+                        >
+                            <i className="bi bi-box-arrow-right me-1"></i>
+                            Logout
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <button
-                    className="btn btn-danger"
-                    onClick={handleLogout}
-                >
-                    <i className="bi bi-box-arrow-right me-2"></i>
-                    Logout
-                </button>
+            </nav>
 
-            </div>
+            {/* MAIN */}
 
-            <div className="card shadow-sm">
+            <div className="container py-4">
 
-                <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center mb-4">
 
-                    <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 className="fw-bold mb-1">
+                            Dashboard
+                        </h2>
 
-                            <h4 className="mb-0">
+                        <p className="text-muted mb-0">
+                            Manage your tasks efficiently
+                        </p>
+                    </div>
+
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => navigate("/tasks/create")}
+                    >
+                        <i className="bi bi-plus-lg me-1"></i>
+                        Create Task
+                    </button>
+
+                </div>
+
+                {/* STATISTICS */}
+
+                <div className="row g-3 mb-4">
+
+                    <div className="col-md-3">
+
+                        <div className="card border-0 shadow-sm h-100">
+
+                            <div className="card-body">
+
+                                <div className="text-muted">
+                                    Total Tasks
+                                </div>
+
+                                <h2 className="fw-bold mb-0">
+                                    {totalTasks}
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div className="col-md-3">
+
+                        <div className="card border-0 shadow-sm h-100">
+
+                            <div className="card-body">
+
+                                <div className="text-muted">
+                                    Pending
+                                </div>
+
+                                <h2 className="fw-bold text-secondary mb-0">
+                                    {pendingTasks}
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div className="col-md-3">
+
+                        <div className="card border-0 shadow-sm h-100">
+
+                            <div className="card-body">
+
+                                <div className="text-muted">
+                                    In Progress
+                                </div>
+
+                                <h2 className="fw-bold text-warning mb-0">
+                                    {inProgressTasks}
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div className="col-md-3">
+
+                        <div className="card border-0 shadow-sm h-100">
+
+                            <div className="card-body">
+
+                                <div className="text-muted">
+                                    Completed
+                                </div>
+
+                                <h2 className="fw-bold text-success mb-0">
+                                    {completedTasks}
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {/* TASK TABLE */}
+
+                <div className="card border-0 shadow-sm">
+
+                    <div className="card-body">
+
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+
+                            <h4 className="fw-bold mb-0">
                                 My Tasks
                             </h4>
 
-                            <button
-                                className="btn btn-primary"
-                                onClick={() => navigate("/tasks/create")}
-                            >
-                                <i className="bi bi-plus-circle me-2"></i>
-                                Create Task
-                            </button>
+                        </div>
+
+                        {/* FILTERS */}
+
+                        <div className="row g-2 mb-4">
+
+                            <div className="col-md-6">
+
+                                <div className="input-group">
+
+                                    <span className="input-group-text">
+                                        <i className="bi bi-search"></i>
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Search tasks..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            <div className="col-md-3">
+
+                                <select
+                                    className="form-select"
+                                    value={statusFilter}
+                                    onChange={(e) =>
+                                        setStatusFilter(e.target.value)
+                                    }
+                                >
+
+                                    <option value="ALL">
+                                        All Status
+                                    </option>
+
+                                    <option value="PENDING">
+                                        Pending
+                                    </option>
+
+                                    <option value="IN_PROGRESS">
+                                        In Progress
+                                    </option>
+
+                                    <option value="COMPLETED">
+                                        Completed
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div className="col-md-3">
+
+                                <select
+                                    className="form-select"
+                                    value={priorityFilter}
+                                    onChange={(e) =>
+                                        setPriorityFilter(e.target.value)
+                                    }
+                                >
+
+                                    <option value="ALL">
+                                        All Priority
+                                    </option>
+
+                                    <option value="LOW">
+                                        Low
+                                    </option>
+
+                                    <option value="MEDIUM">
+                                        Medium
+                                    </option>
+
+                                    <option value="HIGH">
+                                        High
+                                    </option>
+
+                                </select>
+
+                            </div>
 
                         </div>
 
-                    {loading ? (
+                        {/* LOADING */}
 
-                        <p>Loading tasks...</p>
+                        {loading && (
 
-                    ) : tasks.length === 0 ? (
+                            <div className="text-center py-5">
 
-                        <div className="text-center py-5">
+                                <div
+                                    className="spinner-border text-primary"
+                                    role="status"
+                                ></div>
 
-                            <i className="bi bi-check2-square fs-1 text-muted"></i>
+                                <p className="mt-2 text-muted">
+                                    Loading tasks...
+                                </p>
 
-                            <p className="mt-3 text-muted">
-                                No tasks found.
-                            </p>
+                            </div>
 
-                        </div>
+                        )}
 
-                    ) : (
+                        {/* EMPTY */}
 
-                        <div className="table-responsive">
+                        {!loading && filteredTasks.length === 0 && (
 
-                            <table className="table table-hover">
+                            <div className="text-center py-5">
 
-                                <thead>
+                                <i className="bi bi-inbox fs-1 text-muted"></i>
 
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Title</th>
-                                        <th>Description</th>
-                                        <th>Status</th>
-                                        <th>Priority</th>
-                                        <th>Actions</th>
-                                    </tr>
+                                <h5 className="mt-3">
+                                    No tasks found
+                                </h5>
 
-                                </thead>
-                                <tbody>
-            {tasks.map((task) => (
-                <tr key={task.id}>
+                                <p className="text-muted">
+                                    Try changing your search or filters.
+                                </p>
 
-                    <td>{task.id}</td>
+                            </div>
 
-                    <td>{task.title}</td>
+                        )}
 
-                    <td>{task.description}</td>
+                        {/* TABLE */}
 
-                    <td>
-                        <span className={`badge ${
-                            task.status === "COMPLETED"
-                                ? "bg-success"
-                                : task.status === "IN_PROGRESS"
-                                    ? "bg-warning text-dark"
-                                    : "bg-secondary"
-                        }`}>
-                            {task.status}
-                        </span>
-                    </td>
+                        {!loading && filteredTasks.length > 0 && (
 
-                    <td>
-                        <span className={`badge ${
-                            task.priority === "HIGH"
-                                ? "bg-danger"
-                                : task.priority === "MEDIUM"
-                                    ? "bg-warning text-dark"
-                                    : "bg-info"
-                        }`}>
-                            {task.priority}
-                        </span>
-                    </td>
+                            <div className="table-responsive">
 
-                    <td>
+                                <table className="table align-middle">
 
-                        <button
-                            className="btn btn-sm btn-outline-primary me-2"
-                            onClick={() => navigate(`/tasks/edit/${task.id}`)}
-                        >
-                            <i className="bi bi-pencil"></i>
-                        </button>
+                                    <thead className="table-light">
 
-                        <button
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => deleteTask(task.id)}
-                        >
-                            <i className="bi bi-trash"></i>
-                        </button>
+                                        <tr>
 
-            </td>
+                                            <th>ID</th>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
 
-        </tr>
-    ))}
-</tbody>
+                                        </tr>
 
+                                    </thead>
 
+                                    <tbody>
 
-                            </table>
+                                        {filteredTasks.map((task) => (
 
-                        </div>
+                                            <tr key={task.id}>
 
-                    )}
+                                                <td>
+                                                    #{task.id}
+                                                </td>
+
+                                                <td className="fw-semibold">
+                                                    {task.title}
+                                                </td>
+
+                                                <td className="text-muted">
+                                                    {task.description}
+                                                </td>
+
+                                                <td>
+
+                                                    <span className={`badge ${
+                                                        task.priority === "HIGH"
+                                                            ? "bg-danger"
+                                                            : task.priority === "MEDIUM"
+                                                                ? "bg-warning text-dark"
+                                                                : "bg-info"
+                                                    }`}>
+                                                        {String(task.priority || "").replace("_", " ")}
+                                                    </span>
+
+                                                </td>
+
+                                                <td>
+
+                                                    <span className={`badge ${
+                                                        task.status === "COMPLETED"
+                                                            ? "bg-success"
+                                                            : task.status === "IN_PROGRESS"
+                                                                ? "bg-warning text-dark"
+                                                                : "bg-secondary"
+                                                    }`}>
+                                                        {String(task.status || "").replace("_", " ")}
+                                                    </span>
+
+                                                </td>
+
+                                                <td>
+
+                                                    <button
+                                                        className="btn btn-sm btn-outline-primary me-2"
+                                                        onClick={() =>
+                                                            navigate(`/tasks/edit/${task.id}`)
+                                                        }
+                                                    >
+                                                        <i className="bi bi-pencil"></i>
+                                                    </button>
+
+                                                    <button
+                                                        className="btn btn-sm btn-outline-danger"
+                                                        onClick={() =>
+                                                            deleteTask(task.id)
+                                                        }
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+
+                                                </td>
+
+                                            </tr>
+
+                                        ))}
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        )}
+
+                    </div>
 
                 </div>
 

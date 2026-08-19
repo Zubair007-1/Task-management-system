@@ -1,4 +1,4 @@
-package com.zubair.taskmanager.security;
+package com.zubair.taskmanager.service;
 
 import com.zubair.taskmanager.entity.User;
 import com.zubair.taskmanager.repository.UserRepository;
@@ -30,7 +30,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+                List.of(
+                        new SimpleGrantedAuthority(
+                                "ROLE_" + user.getRole()
+                        )
+                )
         );
     }
 }
